@@ -1,0 +1,9 @@
+{
+  "ConnectionStrings": {
+    "Input": "Server=server1;Database=InputDB;User Id=user;Password=pass;",
+    "Output": "Server=server2;Database=OutputDB;User Id=user;Password=pass;"
+  },
+  "Logging": {
+    "Verbosity": "Info"
+  }
+}

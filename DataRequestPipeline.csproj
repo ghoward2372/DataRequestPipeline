@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="DataRequestPipeline.Contracts\" />
+    <Folder Include="DataRequestPipeline.Core\Plugins\Cleanup\" />
+    <Folder Include="DataRequestPipeline.Core\Plugins\Clean\" />
+    <Folder Include="DataRequestPipeline.Core\Plugins\Export\" />
+    <Folder Include="DataRequestPipeline.Core\Plugins\PerformRequest\" />
+    <Folder Include="DataRequestPipeline.Core\Plugins\Setup\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Composition" Version="9.0.3" />
+    <PackageReference Include="System.Composition.AttributedModel" Version="9.0.3" />
+    <PackageReference Include="System.Composition.Hosting" Version="9.0.3" />
+    <PackageReference Include="System.Composition.TypedParts" Version="9.0.3" />
+    <PackageReference Include="System.Text.Json" Version="9.0.3" />
+  </ItemGroup>
+
+</Project>
