@@ -5,6 +5,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	 <PublishSingleFile>true</PublishSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +14,7 @@
     <Folder Include="DataRequestPipeline.Core\Plugins\Cleanup\" />
     <Folder Include="DataRequestPipeline.Core\Plugins\Clean\" />
     <Folder Include="DataRequestPipeline.Core\Plugins\Export\" />
+    <Folder Include="DataRequestPipeline.Core\Plugins\Test\" />
     <Folder Include="DataRequestPipeline.Core\Plugins\PerformRequest\" />
     <Folder Include="DataRequestPipeline.Core\Plugins\Setup\" />
   </ItemGroup>

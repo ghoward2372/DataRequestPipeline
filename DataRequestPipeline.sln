@@ -11,10 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SetupPlugin", "SetupPlugin\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditRequestCleanPlugin", "AuditRequestCleanPlugin\AuditRequestCleanPlugin.csproj", "{819FE9FE-3616-4DF4-8F22-574F45D9C27B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditRequest_RequestPlugin", "..\AuditRequest_RequestPlugin\AuditRequest_RequestPlugin.csproj", "{03DE4EC8-BF29-4C53-86B0-BAD7CD90A308}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditRequest_ExportPlugin", "..\AuditRequest_ExportPlugin\AuditRequest_ExportPlugin.csproj", "{288EFD3E-D276-4D6A-88E0-CD23B239A6A9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,14 +33,6 @@ Global
 		{819FE9FE-3616-4DF4-8F22-574F45D9C27B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{819FE9FE-3616-4DF4-8F22-574F45D9C27B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{819FE9FE-3616-4DF4-8F22-574F45D9C27B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{03DE4EC8-BF29-4C53-86B0-BAD7CD90A308}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{03DE4EC8-BF29-4C53-86B0-BAD7CD90A308}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{03DE4EC8-BF29-4C53-86B0-BAD7CD90A308}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{03DE4EC8-BF29-4C53-86B0-BAD7CD90A308}.Release|Any CPU.Build.0 = Release|Any CPU
-		{288EFD3E-D276-4D6A-88E0-CD23B239A6A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{288EFD3E-D276-4D6A-88E0-CD23B239A6A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{288EFD3E-D276-4D6A-88E0-CD23B239A6A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{288EFD3E-D276-4D6A-88E0-CD23B239A6A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

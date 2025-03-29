@@ -25,6 +25,12 @@ namespace DataRequestPipeline.DataContracts
         Task ExecuteAsync(CleanupContext context);
     }
 
+
+    public interface ITestPlugin
+    {
+        Task ExecuteAsync(TestContext context);
+    }
+
     /// <summary>
     /// Interface for data cleaning plugins.
     /// </summary>

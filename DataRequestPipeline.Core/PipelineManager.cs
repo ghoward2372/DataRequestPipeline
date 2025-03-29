@@ -44,10 +44,13 @@ namespace DataRequestPipeline.Core
                             : string.Empty;
                     });
 
-                // Stage 4: Export (no rollback required by design, but we still call a rollback method if needed)
+                /// Stage 4 : Run the test
+                await ExecuteStageAsync<ITestPlugin, TestContext>("Plugins/Test", "test.json");
+
+                // Stage 5: Export (no rollback required by design, but we still call a rollback method if needed)
                 await ExecuteStageAsync<IExportPlugin, ExportContext>("Plugins/Export", "export.json");
 
-                // Stage 5: Cleanup (rollback not needed)
+                // Stage 6: Cleanup (rollback not needed)
                 await ExecuteStageAsync<ICleanupPlugin, CleanupContext>("Plugins/Cleanup", "cleanup.json", null, hasRollback: false);
 
                 StatusUpdated?.Invoke("DataRequestPipeline completed successfully.");
