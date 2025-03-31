@@ -65,13 +65,12 @@ namespace DataRequestPipeline.Core
                 throw;
             }
         }
-
         /// <summary>
-        /// Generic method for executing a stage.
-        /// T: Plugin interface type.
-        /// C: Context type (must inherit from DataRequestBaseContext and have a parameterless constructor).
+        /// Executes a pipeline stage by loading plugins using PluginLoaderHelper.
+        /// T: The plugin interface (e.g., ISetupPlugin, ICleanPlugin, etc.)
+        /// C: The context type (e.g., SetupContext) that inherits from DataRequestBaseContext.
         /// </summary>
-        private async Task ExecuteStageAsync<T, C>(string pluginDirectory, string configFile, Action<C> contextInitializer = null, bool hasRollback = true)
+        public async Task ExecuteStageAsync<T, C>(string pluginDirectory, string configFile, Action<C> contextInitializer = null, bool hasRollback = true)
             where C : DataRequestBaseContext, new()
         {
             Logger.Log($"Starting stage for plugins in: {pluginDirectory}");
@@ -88,52 +87,133 @@ namespace DataRequestPipeline.Core
             C context = new C();
             contextInitializer?.Invoke(context);
 
-            // Load plugins using MEF.
-            IEnumerable<T> plugins = LoadPlugins<T>(pluginDirectory);
             var executedPlugins = new List<T>();
 
-            // Execute plugins in the order specified in the configuration.
+            // Iterate through the plugin identifiers (assume these are fully qualified type names).
             foreach (var pluginId in config.Plugins)
             {
-                T plugin = FindPluginById(plugins, pluginId);
-                if (plugin == null)
-                {
-                    string err = $"Plugin '{pluginId}' not found in directory {pluginDirectory}";
-                    Logger.Log(err);
-                    throw new Exception(err);
-                }
+                // Build the expected plugin DLL path.
+                // For example, if pluginId is "SetupPlugins.SetupPluginA", we assume the DLL is "SetupPluginA.dll"
+                // Adjust this convention as needed.
+                string pluginFileName = pluginId.Split('.')[pluginId.Split('.').Length - 1] + ".dll";
+                string pluginFilePath = Path.Combine(pluginDirectory, pluginFileName);
 
-                string startMsg = $"Starting plugin {pluginId} in stage {pluginDirectory}.";
-                StatusUpdated?.Invoke(startMsg);
-                Logger.Log(startMsg);
+                Logger.Log($"Loading plugin '{pluginId}' from '{pluginFilePath}'...");
 
                 try
                 {
-                    // Dynamically call ExecuteAsync on the plugin.
+                    // Use the generic loader. It will return an instance cast to T.
+                    T plugin = PluginLoaderHelper.LoadPlugin<T>(pluginFilePath, pluginId);
+                    Logger.Log($"Loaded plugin: {plugin.GetType().FullName}");
+
+                    // Execute the plugin (assuming the plugin implements an asynchronous ExecuteAsync method).
                     await ((dynamic)plugin).ExecuteAsync(context);
                     executedPlugins.Add(plugin);
-                    if (context is TestContext)
-                    {
-                        TestContext? tContext = context as TestContext;
-                        if (tContext != null && tContext.TestsPassed == false)
-                        {
-                            throw new Exception("Test Stage Failed");
-                        }
-                    }
                 }
                 catch (Exception ex)
                 {
-                    string err = $"Error in plugin {pluginId}: {ex.Message}";
-                    Logger.Log(err);
-                    StatusUpdated?.Invoke(err);
+                    Logger.Log($"Error executing plugin '{pluginId}': {ex.Message}");
+                    StatusUpdated?.Invoke($"Error in plugin '{pluginId}': {ex.Message}");
                     if (hasRollback)
                     {
-                        await RollbackPluginsAsync(executedPlugins, context);
+                        // Optionally, implement rollback logic here for executed plugins.
                     }
                     throw;
                 }
             }
         }
+
+        private PluginConfig ReadPluginConfig(string configFile)
+        {
+            if (!File.Exists(configFile))
+            {
+                Logger.Log($"Configuration file {configFile} not found. Using default configuration.");
+                return new PluginConfig();
+            }
+
+            try
+            {
+                string json = File.ReadAllText(configFile);
+                PluginConfig config = JsonSerializer.Deserialize<PluginConfig>(json);
+                Logger.Log($"Loaded configuration from {configFile}.");
+                return config;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Error reading configuration file {configFile}: {ex.Message}");
+                throw;
+            }
+        }
+        /// <summary>
+        /// Generic method for executing a stage.
+        /// T: Plugin interface type.
+        /// C: Context type (must inherit from DataRequestBaseContext and have a parameterless constructor).
+        /// </summary>
+        /// 
+
+        //private async Task ExecuteStageAsync<T, C>(string pluginDirectory, string configFile, Action<C> contextInitializer = null, bool hasRollback = true)
+        //    where C : DataRequestBaseContext, new()
+        //{
+        //    Logger.Log($"Starting stage for plugins in: {pluginDirectory}");
+
+        //    // Read stage configuration.
+        //    PluginConfig config = ReadPluginConfig(configFile);
+        //    if (!config.Enabled)
+        //    {
+        //        Logger.Log($"Stage {pluginDirectory} is disabled via configuration.");
+        //        return;
+        //    }
+
+        //    // Create and initialize the context.
+        //    C context = new C();
+        //    contextInitializer?.Invoke(context);
+
+        //    // Load plugins using MEF.
+        //    IEnumerable<T> plugins = LoadPlugins<T>(pluginDirectory);
+        //    var executedPlugins = new List<T>();
+
+        //    // Execute plugins in the order specified in the configuration.
+        //    foreach (var pluginId in config.Plugins)
+        //    {
+        //        T plugin = FindPluginById(plugins, pluginId);
+        //        if (plugin == null)
+        //        {
+        //            string err = $"Plugin '{pluginId}' not found in directory {pluginDirectory}";
+        //            Logger.Log(err);
+        //            throw new Exception(err);
+        //        }
+
+        //        string startMsg = $"Starting plugin {pluginId} in stage {pluginDirectory}.";
+        //        StatusUpdated?.Invoke(startMsg);
+        //        Logger.Log(startMsg);
+
+        //        try
+        //        {
+        //            // Dynamically call ExecuteAsync on the plugin.
+        //            await ((dynamic)plugin).ExecuteAsync(context);
+        //            executedPlugins.Add(plugin);
+        //            if (context is TestContext)
+        //            {
+        //                TestContext? tContext = context as TestContext;
+        //                if (tContext != null && tContext.TestsPassed == false)
+        //                {
+        //                    throw new Exception("Test Stage Failed");
+        //                }
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            string err = $"Error in plugin {pluginId}: {ex.Message}";
+        //            Logger.Log(err);
+        //            StatusUpdated?.Invoke(err);
+        //            if (hasRollback)
+        //            {
+        //                await RollbackPluginsAsync(executedPlugins, context);
+        //            }
+        //            throw;
+        //        }
+        //    }
+        //}
 
         private async Task RollbackPluginsAsync<T>(List<T> executedPlugins, DataRequestBaseContext context)
         {
@@ -170,9 +250,9 @@ namespace DataRequestPipeline.Core
                 return Enumerable.Empty<T>();
             }
 
-            string pluginFolder = Path.GetFullPath("Plugins/Setup");
 
-            foreach (var file in Directory.GetFiles(pluginFolder, "*.dll"))
+
+            foreach (var file in Directory.GetFiles(directory, "*.dll"))
             {
                 try
                 {
@@ -220,27 +300,27 @@ namespace DataRequestPipeline.Core
             return default;
         }
 
-        private PluginConfig ReadPluginConfig(string configFile)
-        {
-            if (!File.Exists(configFile))
-            {
-                Logger.Log($"Configuration file {configFile} not found. Using default configuration.");
-                return new PluginConfig();
-            }
+        //private PluginConfig ReadPluginConfig(string configFile)
+        //{
+        //    if (!File.Exists(configFile))
+        //    {
+        //        Logger.Log($"Configuration file {configFile} not found. Using default configuration.");
+        //        return new PluginConfig();
+        //    }
 
-            try
-            {
-                string json = File.ReadAllText(configFile);
-                PluginConfig config = JsonSerializer.Deserialize<PluginConfig>(json);
-                Logger.Log($"Loaded configuration from {configFile}.");
-                return config;
-            }
-            catch (Exception ex)
-            {
-                Logger.Log($"Error reading configuration file {configFile}: {ex.Message}");
-                throw;
-            }
-        }
+        //    try
+        //    {
+        //        string json = File.ReadAllText(configFile);
+        //        PluginConfig config = JsonSerializer.Deserialize<PluginConfig>(json);
+        //        Logger.Log($"Loaded configuration from {configFile}.");
+        //        return config;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Log($"Error reading configuration file {configFile}: {ex.Message}");
+        //        throw;
+        //    }
+        //}
 
         private GlobalConfig LoadGlobalConfig(string configFile)
         {

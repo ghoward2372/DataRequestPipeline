@@ -41,4 +41,25 @@ public class PluginLoadContext : AssemblyLoadContext
 
         return null;
     }
+    protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
+    {
+        // First, try to resolve using the plugin's own dependency resolver.
+        string libraryPath = _resolver.ResolveUnmanagedDllToPath(unmanagedDllName);
+        if (!string.IsNullOrEmpty(libraryPath))
+        {
+            return LoadUnmanagedDllFromPath(libraryPath);
+        }
+
+        // If not found, try loading from the host's base directory.
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // On Windows, the native DLL name typically ends with ".dll"
+        string candidate = Path.Combine(baseDir, unmanagedDllName + ".dll");
+        if (File.Exists(candidate))
+        {
+            return LoadUnmanagedDllFromPath(candidate);
+        }
+
+        // Otherwise, fallback.
+        return base.LoadUnmanagedDll(unmanagedDllName);
+    }
 }

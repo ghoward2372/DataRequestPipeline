@@ -7,11 +7,16 @@
     <Nullable>enable</Nullable>
 	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-
+	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DataRequestPipeline.Contracts\" />
+    <Compile Remove="DataRequestPipeline.Contracts\**" />
+    <EmbeddedResource Remove="DataRequestPipeline.Contracts\**" />
+    <None Remove="DataRequestPipeline.Contracts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="DataRequestPipeline.Core\Plugins\Cleanup\" />
     <Folder Include="DataRequestPipeline.Core\Plugins\Clean\" />
     <Folder Include="DataRequestPipeline.Core\Plugins\Export\" />
@@ -21,8 +26,39 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="McMaster.NETCore.Plugins" Version="2.0.0" />
     <PackageReference Include="System.ComponentModel.Composition" Version="9.0.3" />
     <PackageReference Include="System.Text.Json" Version="9.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DataRequestPipeline.DataContracts">
+      <HintPath>..\DataRequestPipeline.DataContracts.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Clean.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Cleanup.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Export.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="global.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PerformRequest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Setup.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Test.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
