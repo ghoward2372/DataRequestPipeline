@@ -6,7 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-	 <PublishSingleFile>true</PublishSingleFile>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,9 +22,6 @@
 
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Composition" Version="9.0.3" />
-    <PackageReference Include="System.Composition.AttributedModel" Version="9.0.3" />
-    <PackageReference Include="System.Composition.Hosting" Version="9.0.3" />
-    <PackageReference Include="System.Composition.TypedParts" Version="9.0.3" />
     <PackageReference Include="System.Text.Json" Version="9.0.3" />
   </ItemGroup>
 

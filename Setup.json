@@ -1,7 +1,6 @@
 {
   "enabled": true,
   "plugins": [
-    "SetupPluginA",
-    "SetupPluginB"
+    "SetupPluginA"    
   ]
 }

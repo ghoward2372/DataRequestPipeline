@@ -1,6 +1,7 @@
 ﻿using DataRequestPipeline.Core.Configuration;
 using DataRequestPipeline.DataContracts;
 using System.ComponentModel.Composition.Hosting;
+using System.Reflection;
 using System.Text.Json;
 
 namespace DataRequestPipeline.Core
@@ -43,6 +44,7 @@ namespace DataRequestPipeline.Core
                             ? _globalConfig.ConnectionStrings["Output"]
                             : string.Empty;
                     });
+
 
                 /// Stage 4 : Run the test
                 await ExecuteStageAsync<ITestPlugin, TestContext>("Plugins/Test", "test.json");
@@ -110,6 +112,14 @@ namespace DataRequestPipeline.Core
                     // Dynamically call ExecuteAsync on the plugin.
                     await ((dynamic)plugin).ExecuteAsync(context);
                     executedPlugins.Add(plugin);
+                    if (context is TestContext)
+                    {
+                        TestContext? tContext = context as TestContext;
+                        if (tContext != null && tContext.TestsPassed == false)
+                        {
+                            throw new Exception("Test Stage Failed");
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -142,6 +152,13 @@ namespace DataRequestPipeline.Core
                 }
             }
         }
+        public Assembly LoadPluginAssembly(string pluginDllPath)
+        {
+            string pluginFolder = Path.GetDirectoryName(pluginDllPath);
+            var loadContext = new PluginLoadContext(pluginFolder);
+            return loadContext.LoadFromAssemblyPath(pluginDllPath);
+        }
+
 
         private IEnumerable<T> LoadPlugins<T>(string directory)
         {
@@ -153,11 +170,17 @@ namespace DataRequestPipeline.Core
                 return Enumerable.Empty<T>();
             }
 
-            foreach (var file in Directory.GetFiles(directory, "*.dll"))
+            string pluginFolder = Path.GetFullPath("Plugins/Setup");
+
+            foreach (var file in Directory.GetFiles(pluginFolder, "*.dll"))
             {
                 try
                 {
-                    var assembly = System.Reflection.Assembly.LoadFrom(file);
+                    string absolutePath = Path.GetFullPath(file);
+                    //var assembly = System.Reflection.Assembly.LoadFrom(file);
+                    var assembly = LoadPluginAssembly(absolutePath);
+                    var hostContractAssembly = typeof(DataRequestPipeline.DataContracts.ISetupPlugin).Assembly;
+                    Console.WriteLine("Host contract assembly: " + hostContractAssembly.Location);
                     assemblies.Add(assembly);
                     Logger.Log($"Loaded assembly {Path.GetFileName(file)}.");
                 }
